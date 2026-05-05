@@ -64,7 +64,9 @@ PostgreSQL — idempotency_records table
 
 bash
 # 1. Clone the repo
-git clone
+git clone 
+`https://github.com/graceniyigena34/AmaliTech-DEG-Project-based-challenges-Backend-`
+
 cd Idempotency-gateway
 
 # 2. Install dependencies
@@ -76,12 +78,12 @@ cp .env.example .env
 
 # 4. Start the server (table is auto-created on first boot)
 npm run dev
-```
+
 
 The server starts at `http://localhost:5000`
 Swagger UI is available at `http://localhost:5000/api-docs`
 
----
+
 
 ## 3. API Documentation
 
@@ -103,7 +105,7 @@ Processes a payment exactly once per unique `Idempotency-Key`.
   "amount": 100,
   "currency": "GHS"
 }
-```
+
 
 **Responses**
 
@@ -128,7 +130,7 @@ curl -X POST http://localhost:5000/process-payment \
 ```
 
 **Example — Duplicate Request (same key + same body)**
-```bash
+bash
 curl -X POST http://localhost:5000/process-payment \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
@@ -150,9 +152,9 @@ curl -X POST http://localhost:5000/process-payment \
 # Response
 # 422 Unprocessable Entity
 { "error": "Idempotency key already used for a different request body." }
-```
 
----
+
+
 
 ## 4. Design Decisions
 
@@ -168,7 +170,7 @@ A Node.js `Map<key, Promise>` tracks requests currently being processed. If a du
 ### 2-second simulated delay
 Mimics a real payment processor network call, making the in-flight race condition scenario realistic and testable.
 
----
+
 
 ## 5. Developer's Choice — Idempotency Key Expiry (24-hour TTL)
 
@@ -183,7 +185,7 @@ Without expiry, idempotency keys live forever in the database. This creates two 
 
 A 24-hour TTL is the industry standard (used by Stripe, PayStack, etc.) — long enough to cover any reasonable retry window, short enough to keep the table lean.
 
----
+
 
 ## 6. Running Tests
 
