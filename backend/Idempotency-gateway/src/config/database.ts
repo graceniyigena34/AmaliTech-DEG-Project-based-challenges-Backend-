@@ -3,13 +3,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const pool = new Pool({
-  host: process.env["PGHOST"],
-  port: Number(process.env["PGPORT"]),
-  user: process.env["PGUSER"],
-  password: process.env["PGPASSWORD"],
-  database: process.env["PGDATABASE"],
-});
+const pool = process.env["DATABASE_URL"]
+  ? new Pool({
+      connectionString: process.env["DATABASE_URL"],
+      ssl: { rejectUnauthorized: false },
+    })
+  : new Pool({
+      host: process.env["PGHOST"],
+      port: Number(process.env["PGPORT"]),
+      user: process.env["PGUSER"],
+      password: process.env["PGPASSWORD"],
+      database: process.env["PGDATABASE"],
+    });
 
 export async function initDB(): Promise<void> {
   await pool.query(`
@@ -25,7 +30,6 @@ export async function initDB(): Promise<void> {
     )
   `);
 
-  // Add expires_at to existing tables that were created without it
   await pool.query(`
     ALTER TABLE idempotency_records
     ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
