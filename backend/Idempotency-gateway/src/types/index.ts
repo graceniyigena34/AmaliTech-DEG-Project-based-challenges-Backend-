@@ -6,6 +6,7 @@ export interface IdempotencyRecord {
   response_status: number | null;
   response_body: object | null;
   created_at: Date;
+  expires_at: Date;
 }
 
 export interface PaymentRequest {

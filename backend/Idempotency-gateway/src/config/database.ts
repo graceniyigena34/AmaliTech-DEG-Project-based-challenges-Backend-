@@ -20,8 +20,15 @@ export async function initDB(): Promise<void> {
       status VARCHAR(20) NOT NULL DEFAULT 'processing',
       response_status INT,
       response_body JSONB,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
     )
+  `);
+
+  // Add expires_at to existing tables that were created without it
+  await pool.query(`
+    ALTER TABLE idempotency_records
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
   `);
 }
 

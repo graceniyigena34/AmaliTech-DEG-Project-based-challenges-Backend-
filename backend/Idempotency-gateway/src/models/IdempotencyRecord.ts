@@ -3,19 +3,22 @@ import { IdempotencyRecord } from "../types";
 
 export async function findByKey(key: string): Promise<IdempotencyRecord | null> {
   const result = await pool.query(
-    "SELECT * FROM idempotency_records WHERE idempotency_key = $1",
+    "SELECT * FROM idempotency_records WHERE idempotency_key = $1 AND expires_at > NOW()",
     [key]
   );
   return result.rows[0] ?? null;
 }
 
-export async function createRecord(
-  key: string,
-  requestHash: string
-): Promise<void> {
+export async function createRecord(key: string, requestHash: string): Promise<void> {
+  // Remove any expired record with the same key first, then insert fresh
   await pool.query(
-    `INSERT INTO idempotency_records (idempotency_key, request_hash, status)
-     VALUES ($1, $2, 'processing')`,
+    "DELETE FROM idempotency_records WHERE idempotency_key = $1 AND expires_at <= NOW()",
+    [key]
+  );
+  await pool.query(
+    `INSERT INTO idempotency_records (idempotency_key, request_hash, status, expires_at)
+     VALUES ($1, $2, 'processing', NOW() + INTERVAL '24 hours')
+     ON CONFLICT (idempotency_key) DO NOTHING`,
     [key, requestHash]
   );
 }
