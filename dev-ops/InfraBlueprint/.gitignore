@@ -4,3 +4,6 @@
 .terraform.lock.hcl
 *.tfvars
 !example.tfvars
+.env
+*.pem
+*.key

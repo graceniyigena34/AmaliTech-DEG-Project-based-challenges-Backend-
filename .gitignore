@@ -1,0 +1,37 @@
+# Environment variables — never commit real credentials
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Terraform state & secrets
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.example.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# Secrets & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
